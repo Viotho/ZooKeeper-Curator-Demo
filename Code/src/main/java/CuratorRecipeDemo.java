@@ -1,7 +1,24 @@
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.*;
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
 
 public class CuratorRecipeDemo {
+
+    public void  usingWatcher() throws Exception {
+        try(CuratorFramework client = CuratorDemo.initWithBuilder()) {
+            Watcher watcher = new Watcher() {
+                @Override
+                public void process(WatchedEvent watchedEvent) {
+                    System.out.println("Path: " + watchedEvent.getPath());
+                    System.out.println("Type: " + watchedEvent.getType());
+                    System.out.println("State: " + watchedEvent.getState());
+                }
+            };
+            client.start();
+            byte[] content = client.getData().usingWatcher(watcher).forPath("/node1");
+        }
+    }
 
     public void usingCuratorCache() {
         try(CuratorFramework client = CuratorDemo.initWithBuilder()) {
